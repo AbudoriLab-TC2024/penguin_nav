@@ -15,6 +15,7 @@ Navigation 2 を使用した経路計画行うROS 2パッケージです。
         - 1つのグループでの `goThroughPoses` 実行を繰り返す形になっています。
         - `goThroughPoses` 終了時に、キー入力待ちするかそのまま継続するかを選択できます。
     - Ctrl+C でナビゲーションタスクをキャンセルします。
+    - グループを読み込む毎にGlobal Costmap を更新します。
 
 ## インストール
 
@@ -106,6 +107,7 @@ x,y,action
 
 - 入力:
     - `/scan` (`sensor_msgs/msg/LaserScan`) - 2D LiDAR 形式の点群データを受け取ります。Glocal costmap、Local costmap、及び collision monitor に使用されます。
+    - `/pcl_pose` -> ロボットの位置を受け取ります。Global costmap 更新時のサイズ計算に使用されます。
     - `/tf`,`/static_tf` - `map` -> `base_link` が必要です。
 - 出力:
     - `/cmd_vel` (`geometry_msgs/msg/Twist`) - 制御コマンドです。
