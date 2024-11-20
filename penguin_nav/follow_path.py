@@ -3,7 +3,7 @@
 from geometry_msgs.msg import PoseStamped, Pose
 from std_msgs.msg import Header
 from visualization_msgs.msg import MarkerArray, Marker
-from nav2_simple_commander.robot_navigator import BasicNavigator, TaskResult
+from nav2_simple_commander.robot_navigator import BasicNavigator
 import rclpy
 import rclpy.qos
 import rclpy.clock
@@ -14,6 +14,9 @@ import math
 import sys
 from dataclasses import dataclass
 from typing import List, Tuple
+from rcl_interfaces.srv import SetParameters
+from rclpy import Parameter
+
 
 # Columns configuration
 X = "x"
@@ -21,6 +24,9 @@ Y = "y"
 # for pcl_pose
 # X = "/pcl_pose/pose/pose/position/x"
 # Y = "/pcl_pose/pose/pose/position/y"
+
+WINDOW_EXPAND = 4.0
+GLOBAL_COSTMAP_NODE = "/global_costmap/global_costmap"
 
 
 @dataclass
@@ -50,9 +56,19 @@ class PathFollower(BasicNavigator):
         self.marker_pub_ = self.create_publisher(
             MarkerArray, "/visualization_marker_array", 5
         )
-        self.last_markers_: List[Marker] = []
+        self.global_costmap_node_param_set_ = self.create_client(
+            SetParameters, f"{GLOBAL_COSTMAP_NODE}/set_parameters"
+        )
+        if not self.global_costmap_node_param_set_.wait_for_service(timeout_sec=1.0):
+            self.warn(f"global costmap node {GLOBAL_COSTMAP_NODE} is not found.")
 
     def execute_one(self, plan: List[Pose2D]):
+        if not self.set_window(
+            (min([p.x for p in plan]), max([p.x for p in plan])),
+            (min([p.y for p in plan]), max([p.y for p in plan])),
+        ):
+            return
+
         header = Header()
         header.frame_id = "map"
         header.stamp = self.get_clock().now().to_msg()
@@ -74,18 +90,20 @@ class PathFollower(BasicNavigator):
     def publish_rviz(self, poses: List[PoseStamped]):
         markers: List[Marker] = []
         self.marker_pub_.publish(
-            MarkerArray(markers=[Marker(ns="waypoints", action=Marker.DELETEALL)])
+            MarkerArray(
+                markers=[Marker(ns="current_waypoints", action=Marker.DELETEALL)]
+            )
         )
         for i, p in enumerate(poses):
             m = Marker()
-            m.ns = "waypoints"
+            m.ns = "current_waypoints"
             m.id = i
             m.type = Marker.ARROW
             m.action = Marker.ADD
             m.lifetime = Duration().to_msg()
-            m.scale.x = 0.2
-            m.scale.y = 0.05
-            m.scale.z = 0.05
+            m.scale.x = 0.4
+            m.scale.y = 0.1
+            m.scale.z = 0.1
             m.color.r = 0.0
             m.color.g = 1.0
             m.color.b = 1.0
@@ -97,6 +115,28 @@ class PathFollower(BasicNavigator):
             markers.append(m)
 
         self.marker_pub_.publish(MarkerArray(markers=markers))
+
+    def set_window(self, x_range, y_range):
+        origin_x = float(x_range[0] - WINDOW_EXPAND)
+        origin_y = float(y_range[0] - WINDOW_EXPAND)
+        width = int(x_range[1] - x_range[0] + WINDOW_EXPAND * 2)
+        height = int(y_range[1] - y_range[0] + WINDOW_EXPAND * 2)
+        future = self.global_costmap_node_param_set_.call_async(
+            SetParameters.Request(
+                parameters=[
+                    Parameter(name="origin_x", value=origin_x).to_parameter_msg(),
+                    Parameter(name="origin_y", value=origin_y).to_parameter_msg(),
+                    Parameter(name="width", value=width).to_parameter_msg(),
+                    Parameter(name="height", value=height).to_parameter_msg(),
+                ]
+            )
+        )
+        rclpy.spin_until_future_complete(self, future)
+        ret = future.result()
+        if not all([r.successful for r in ret.results]):
+            self.warn(ret)
+            return False
+        return True
 
 
 def df_to_poses(df: pd.DataFrame) -> List[Pose2D]:
@@ -112,7 +152,10 @@ def df_to_poses(df: pd.DataFrame) -> List[Pose2D]:
         poses[i].yaw = yaw
 
     # repeat tail yaw
-    poses[-1].yaw = poses[-2].yaw
+    if len(poses) > 1:
+        poses[-1].yaw = poses[-2].yaw
+    else:
+        poses[-1].yaw = 0.0
     return poses
 
 
