@@ -10,9 +10,12 @@ ament_auto_find_build_dependencies()
 
 ament_python_install_package(${PROJECT_NAME})
 
-ament_auto_add_executable(pose_to_tf src/pose_to_tf.cpp)
+ament_auto_add_executable(waypoint_obstacle_avoidance
+  src/main.cpp
+  src/waypoint_obstacle_avoidance.cpp)
 
-ament_auto_add_executable(tf_to_pose src/tf_to_pose.cpp)
+target_compile_definitions(waypoint_obstacle_avoidance
+  PRIVATE "DOCTEST_CONFIG_DISABLE")
 
 install(PROGRAMS
   penguin_nav/follow_path.py
@@ -25,5 +28,16 @@ install(DIRECTORY launch
 install(DIRECTORY config
   DESTINATION share/${PROJECT_NAME}
 )
+
+if(BUILD_TESTING)
+  ament_auto_add_executable(test_executable
+    src/waypoint_obstacle_avoidance.cpp
+    test/test_main.cpp)
+
+  ament_add_test(test_doctest
+    COMMAND $<TARGET_FILE:test_executable> --reporters=junit --out=${AMENT_TEST_RESULTS_DIR}/${PROJECT_NAME}/test_doctest.xml
+    GENERATE_RESULT_FOR_RETURN_CODE_ZERO
+  )
+endif()
 
 ament_auto_package()
