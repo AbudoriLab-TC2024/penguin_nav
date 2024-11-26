@@ -12,6 +12,8 @@ ament_python_install_package(${PROJECT_NAME})
 
 ament_auto_add_executable(pose_to_tf src/pose_to_tf.cpp)
 
+ament_auto_add_executable(tf_to_pose src/tf_to_pose.cpp)
+
 install(PROGRAMS
   penguin_nav/follow_path.py
   DESTINATION lib/${PROJECT_NAME})

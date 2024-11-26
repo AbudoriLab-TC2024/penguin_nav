@@ -11,6 +11,6 @@
   </include>
   <group if="$(var visualize)">
     <node pkg="rviz2" exec="rviz2" args="-d $(var rviz_config)" />
-    <!-- <node pkg="plotjuggler" exec="plotjuggler" args="-l $(var plot_config) -n" /> -->
+    <node pkg="plotjuggler" exec="plotjuggler" args="-l $(var plot_config) -n" />
   </group>
 </launch>
