@@ -1,0 +1,6 @@
+# Adjust Waypoints
+
+geometry_msgs/PoseStamped[] waypoints
+---
+bool modified
+geometry_msgs/PoseStamped[] waypoints
