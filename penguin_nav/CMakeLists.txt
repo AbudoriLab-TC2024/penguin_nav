@@ -12,6 +12,7 @@ ament_python_install_package(${PROJECT_NAME})
 
 ament_auto_add_executable(waypoint_obstacle_avoidance
   src/main.cpp
+  src/util.cpp
   src/waypoint_obstacle_avoidance.cpp)
 
 target_compile_definitions(waypoint_obstacle_avoidance
@@ -32,6 +33,7 @@ install(DIRECTORY config
 if(BUILD_TESTING)
   ament_auto_add_executable(test_executable
     src/waypoint_obstacle_avoidance.cpp
+    src/util.cpp
     test/test_main.cpp)
 
   ament_add_test(test_doctest
