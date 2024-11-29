@@ -146,6 +146,27 @@ class PathFollower(BasicNavigator):
     def __init__(self, df: pd.DataFrame):
         """Initialize PathFollower and visualize entire plan by publishing rviz marker."""
         super().__init__()
+
+        # ===== loop section =====
+        # ── if not current_plan_ ──────────────────────────>
+        #        └─ if accept go to next
+        #               └─ request_new_plan, set new_plan_
+        # ── if new_plan_ ──────────────────────────────────>
+        #        ├─ send_plan
+        #        └─ set current_plan_, unset new_plan_
+        # ── if current_plan_ and not adjusting_ ───────────>
+        #        └─ request_adjust, set adjusting_
+        #
+        # ===== recive section =====
+        # if adjusting received
+        #       ├─ if should adjust
+        #       │       ├─ cancelTask, send_plan
+        #       │       └─ trim current_plan_
+        #       └─ unset adjusting_
+        #
+        # ===== another thread section =====
+        # ── key input ──────────────────────────>
+
         # global costmap
         self.global_costmap_node_param_set_ = self.create_client(
             SetParameters, f"{GLOBAL_COSTMAP_NODE}/set_parameters"
