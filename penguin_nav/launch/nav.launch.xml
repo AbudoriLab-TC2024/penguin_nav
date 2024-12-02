@@ -5,6 +5,7 @@
   <arg name="plot_config" default="$(find-pkg-share penguin_nav)/config/plotjuggler.xml" />
   <node pkg="tf2_ros" exec="static_transform_publisher" name="base_footprint"
     args="0 0 0 0 0 0 base_link base_footprint" />
+  <node pkg="penguin_nav" exec="waypoint_obstacle_avoidance" />
   <include file="$(find-pkg-share penguin_nav)/launch/navigation_launch.py">
     <arg name="params_file" value="$(find-pkg-share penguin_nav)/config/nav2_params.yaml" />
     <arg name="use_sim_time" value="$(var use_sim_time)" />

@@ -4,9 +4,10 @@ import math
 
 from dataclasses import dataclass
 from scipy.spatial.transform import Rotation
-from typing import List
+from typing import List, Tuple
 
 import geometry_msgs.msg
+import std_msgs.msg
 
 
 @dataclass
@@ -24,10 +25,35 @@ class Waypoint:
             orientation=geometry_msgs.msg.Quaternion(x=q[0], y=q[1], z=q[2], w=q[3]),
         )
 
+    @classmethod
+    def from_pose(cls, pose: geometry_msgs.msg.Pose):
+        q = pose.orientation
+        yaw = Rotation([q.x, q.y, q.z, q.w]).as_euler("ZXY")[0]
+        return cls(pose.position.x, pose.position.y, yaw)
+
 
 @dataclass
 class Plan:
     waypoints: List[Waypoint]
+
+    def to_msg(
+        self, header: std_msgs.msg.Header
+    ) -> Tuple[List[geometry_msgs.msg.PoseStamped], List[float], List[float]]:
+        return (
+            [
+                geometry_msgs.msg.PoseStamped(header=header, pose=w.to_pose())
+                for w in self.waypoints
+            ],
+            [1.0 for _ in range(len(self.waypoints))],
+            [1.0 for _ in range(len(self.waypoints))],
+        )
+
+    @classmethod
+    def from_msg(cls, poses: List[geometry_msgs.msg.PoseStamped]) -> "Plan":
+        return cls([Waypoint.from_pose(p.pose) for p in poses])
+
+    def should_stop(self) -> bool:
+        return self.waypoints[-1].action == "stop"
 
 
 class Loader:

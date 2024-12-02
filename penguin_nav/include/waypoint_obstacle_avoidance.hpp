@@ -3,6 +3,7 @@
 #include <nav_msgs/msg/detail/occupancy_grid__struct.hpp>
 #include <nav_msgs/msg/occupancy_grid.hpp>
 #include <penguin_nav_msgs/srv/adjust_waypoints.hpp>
+#include <penguin_nav_msgs/srv/need_adjust.hpp>
 #include <rclcpp/rclcpp.hpp>
 
 namespace penguin_nav {
@@ -16,6 +17,9 @@ private:
           request,
       std::shared_ptr<penguin_nav_msgs::srv::AdjustWaypoints::Response>
           response);
+  void need_adjust_callback(
+      const std::shared_ptr<penguin_nav_msgs::srv::NeedAdjust::Request> request,
+      std::shared_ptr<penguin_nav_msgs::srv::NeedAdjust::Response> response);
 
   void
   global_costmap_callback(const nav_msgs::msg::OccupancyGrid::SharedPtr msg);
@@ -25,6 +29,8 @@ private:
 
   rclcpp::Service<penguin_nav_msgs::srv::AdjustWaypoints>::SharedPtr
       adjust_waypoints_service_;
+  rclcpp::Service<penguin_nav_msgs::srv::NeedAdjust>::SharedPtr
+      need_adjust_service_;
   rclcpp::Subscription<nav_msgs::msg::OccupancyGrid>::SharedPtr
       global_costmap_sub_;
   rclcpp::Subscription<geometry_msgs::msg::PoseWithCovarianceStamped>::SharedPtr

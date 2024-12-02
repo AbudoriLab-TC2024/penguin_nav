@@ -190,6 +190,11 @@ TEST_CASE("testing adjust_lateral") {
     auto result = adjust_lateral(map, p, 0.9, 0.9, 0.1);
     test(result, {p, false});
   }
+  SUBCASE("not torelance") {
+    auto p = make_pose(5, 5, 0);
+    auto result = adjust_lateral(map, p, 0.0, 0.0, 0.1);
+    test(result, {p, false});
+  }
 }
 
 std::vector<PoseStamped> cut_behind(const std::vector<PoseStamped> &pts,
@@ -297,6 +302,13 @@ WaypointObstacleAvoidanceNode::WaypointObstacleAvoidanceNode()
           "adjust_waypoints",
           std::bind(&WaypointObstacleAvoidanceNode::adjust_waypoints_callback,
                     this, std::placeholders::_1, std::placeholders::_2));
+
+  need_adjust_service_ =
+      this->create_service<penguin_nav_msgs::srv::NeedAdjust>(
+          "need_adjust",
+          std::bind(&WaypointObstacleAvoidanceNode::need_adjust_callback, this,
+                    std::placeholders::_1, std::placeholders::_2));
+
   global_costmap_sub_ = this->create_subscription<nav_msgs::msg::OccupancyGrid>(
       "global_costmap/costmap", 10,
       std::bind(&WaypointObstacleAvoidanceNode::global_costmap_callback, this,
@@ -314,7 +326,7 @@ void WaypointObstacleAvoidanceNode::adjust_waypoints_callback(
         request,
     std::shared_ptr<penguin_nav_msgs::srv::AdjustWaypoints::Response>
         response) {
-  RCLCPP_INFO(this->get_logger(), "Received request to adjust waypoints");
+  RCLCPP_DEBUG(this->get_logger(), "Received request to adjust waypoints");
   response->modified = false;
   response->waypoints = request->waypoints;
 
@@ -337,6 +349,24 @@ void WaypointObstacleAvoidanceNode::adjust_waypoints_callback(
   if (response->modified && pose_) {
     response->waypoints =
         cut_behind(response->waypoints, pose_->pose.pose.position);
+  }
+}
+
+void WaypointObstacleAvoidanceNode::need_adjust_callback(
+    const std::shared_ptr<penguin_nav_msgs::srv::NeedAdjust::Request> request,
+    std::shared_ptr<penguin_nav_msgs::srv::NeedAdjust::Response> response) {
+  RCLCPP_DEBUG(this->get_logger(), "Received request to check need adjust");
+  response->need_adjust = false;
+
+  if (!global_costmap_) {
+    return;
+  }
+
+  for (const auto &p : request->waypoints) {
+    if (is_occupied(*global_costmap_, p.pose.position)) {
+      response->need_adjust = true;
+      break;
+    }
   }
 }
 

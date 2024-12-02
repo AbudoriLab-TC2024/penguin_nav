@@ -10,6 +10,7 @@ ament_auto_find_build_dependencies()
 
 rosidl_generate_interfaces(${PROJECT_NAME}
   "srv/AdjustWaypoints.srv"
+  "srv/NeedAdjust.srv"
   DEPENDENCIES builtin_interfaces geometry_msgs
 )
 
