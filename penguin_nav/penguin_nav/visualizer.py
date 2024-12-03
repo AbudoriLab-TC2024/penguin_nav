@@ -4,6 +4,7 @@ from rclpy.node import Node
 from rclpy.duration import Duration
 from visualization_msgs.msg import MarkerArray, Marker
 import std_msgs.msg
+from geometry_msgs.msg import Point
 
 
 from penguin_nav.waypoint import Waypoint
@@ -17,7 +18,12 @@ class Visualizer:
     def publish(self, wp: List[Waypoint], name, base_color, scale=1.0):
         # delete old
         self._pub.publish(
-            MarkerArray(markers=[Marker(ns=name, action=Marker.DELETEALL)])
+            MarkerArray(
+                markers=[
+                    Marker(ns=name, action=Marker.DELETEALL),
+                    Marker(ns=f"{name}_torelance", action=Marker.DELETEALL),
+                ]
+            )
         )
         header = std_msgs.msg.Header(
             frame_id="map", stamp=self._node.get_clock().now().to_msg()
@@ -47,6 +53,26 @@ class Visualizer:
 
             m.pose = p.to_pose()
             m.header = header
+
+            markers.append(m)
+
+        for i, p in enumerate(wp):
+            m = Marker()
+            m.ns = f"{name}_torelance"
+            m.id = i
+            m.type = Marker.LINE_STRIP
+            m.action = Marker.ADD
+            m.lifetime = Duration().to_msg()
+            m.scale.x = 0.02
+            m.color.r = 0.0
+            m.color.g = 0.0
+            m.color.b = 1.0
+            m.color.a = 1.0
+            m.header = header
+            left = p.left()
+            right = p.right()
+            m.points.append(Point(x=left[0], y=left[1], z=0.0))
+            m.points.append(Point(x=right[0], y=right[1], z=0.0))
 
             markers.append(m)
 
