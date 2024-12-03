@@ -32,7 +32,7 @@ sudo apt-get install ros-${ROS_DISTRO}-navigation2 ros-${ROS_DISTRO}-nav2-bringu
 
 # ビルド
 cd ~/ros2_ws
-colcon build --packages-select penguin_nav
+colcon build
 ```
 
 ## 使用方法
@@ -70,11 +70,11 @@ $ ros2 run penguin_nav follow_path.py -- waypoints_list/waypoints_*.csv
 <details><summary>waypoints.csv の例</summary>
 
 ```csv
-x,y,action
-1,0
+x,y,action,yaw_deg,left_torelance,right_torelance
+1,0,,90
 2,0
-3,0,stop
-4,0
+3,0,stop,180,1.0,1.0
+4,0,,,0.5,0.5
 5,0
 6,0,continue
 7,0
@@ -82,10 +82,33 @@ x,y,action
 9,0
 ```
 
-ウェイポイントは、action列に文字が入っていたらそこを境界としてグループに分割されます。1つのグループが2点以上持つようにしてください。最後の行のactionが空の場合は暗黙的に `stop` と解釈します。
+CSVファイルは以下の列を持ちます。x, y 以外は optional です。
 
-- `stop` : 一時停止しキー入力待ちする
-- `continue` : キー入力を待たず、次のグループを開始する
+- x : 点のx座標 (mapフレーム)
+- y : 点のy座標 (mapフレーム)
+- yaw (optional) : 点のyaw角 (radian, mapフレーム)
+- yaw_deg (optional) : 点のyaw角 (degree, mapフレーム)
+- action (optional) : その点でのアクション（後述）
+- left_torelance (optional) : 点調整時の左側の許容距離
+- right_torelance (optional) : 点調整時の右側の許容距離
+
+省略時は、列自体を省略しても良いですし、特定の行だけ省略しても構いません。
+
+yawおよびyaw_degが省略された場合、その点のyaw角は p[i] -> p[i+1] のベクトルから算出されます。最後の点は1つ前の点の角度がコピーされます。
+yaw角は次の優先度で採用されます。 yaw > yaw_deg > ベクトルからの算出
+
+action は以下のいずれかです。
+
+- 空白
+- continue
+- stop
+
+action は、ファイルの最終行については空白時に stop が挿入されます。
+ウェイポイントは continue あるいは stop で区切ってグルーピングされます。global costmap はこのグループが収まるように調整されるため、costmap が大きすぎないように区切ることを推奨します。
+
+left_torelance 及び right_torelance は、点の位置を調整するための量です。
+これは、ウェイポイントの点が障害物に埋まった時に、その外側に再配置するためのものです。省略時は 0 となります。
+
 
 </details>
 
