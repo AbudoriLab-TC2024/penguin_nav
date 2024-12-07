@@ -73,7 +73,8 @@ controller_server:
       xy_goal_tolerance: 0.8
       stateful: True
       #yaw_goal_tolerance: 0.174 # 10 degrees
-      yaw_goal_tolerance: 3.14 # 10 degrees
+      #yaw_goal_tolerance: 3.14 # 10 degrees
+      yaw_goal_tolerance: 6.28 # 10 degrees
     FollowPath:
       plugin: "dwb_core::DWBLocalPlanner"
       debug_trajectory_details: True
@@ -103,14 +104,14 @@ controller_server:
       angular_granularity: 0.025
       transform_tolerance: 0.2
       xy_goal_tolerance: 0.8
-      trans_stopped_velocity: 0.8
+      trans_stopped_velocity: 0.2
       short_circuit_trajectory_evaluation: True
       limit_vel_cmd_in_traj: False
       stateful: True
       critics: ["RotateToGoal", "Oscillation", "BaseObstacle", "GoalAlign", "PathAlign", "PathDist", "GoalDist"]
       BaseObstacle.scale: 0.02
-      PathAlign.scale: 32.0
-      #PathAlign.scale: 10.0
+      #PathAlign.scale: 32.0
+      PathAlign.scale: 10.0
       GoalAlign.scale: 24.0
       PathAlign.forward_point_distance: 0.1
       GoalAlign.forward_point_distance: 0.1
@@ -395,7 +396,8 @@ planner_server:
       analytic_expansion_max_cost: 200.0  # The maximum single cost for any part of an analytic expansion to contain and be valid, except when necessary on approach to goal
       analytic_expansion_max_cost_override: false  #  Whether or not to override the maximum cost setting if within critical distance to goal (ie probably required)
       #minimum_turning_radius: 0.40        # minimum turning radius in m of path / vehicle
-      minimum_turning_radius: 0.2        # minimum turning radius in m of path / vehicle
+      #minimum_turning_radius: 0.2        # minimum turning radius in m of path / vehicle
+      minimum_turning_radius: 0.1        # minimum turning radius in m of path / vehicle
       reverse_penalty: 2.0                # Penalty to apply if motion is reversing, must be => 1
       change_penalty: 0.0                 # Penalty to apply if motion is changing directions (L to R), must be >= 0
       non_straight_penalty: 1.2           # Penalty to apply if motion is non-straight, must be => 1
@@ -493,7 +495,7 @@ collision_monitor:
     transform_tolerance: 0.5
     source_timeout: 5.0
     base_shift_correction: True
-    stop_pub_timeout: 2.0
+    stop_pub_timeout: 10.0
     # Polygons represent zone around the robot for "stop" and "slowdown" action types,
     # and robot footprint for "approach" action type.
     # Footprint could be "polygon" type with dynamically set footprint from footprint_topic
@@ -504,7 +506,7 @@ collision_monitor:
       type: "polygon"
       #points: [0.5, 0.4, 0.5, -0.4, -0.4, -0.4, -0.4, 0.4]
       #points: [0.65, 0.43, 0.65, -0.43, -0.43, -0.43, -0.43, 0.43]
-      points: [0.65, 0.5, 0.65, -0.5, -0.43, -0.43, -0.43, 0.43]
+      points: [0.75, 0.5, 0.75, -0.5, -0.43, -0.43, -0.43, 0.43]
       action_type: "stop"
       max_points: 3
       visualize: True
