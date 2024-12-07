@@ -45,15 +45,15 @@ class DivideNavigator(BasicNavigator):
         self._costmap_cli = self.create_client(
             SetParameters, f"{costmap_node_name}/set_parameters"
         )
-        if not self._costmap_cli.wait_for_service(timeout_sec=1.0):
+        if not self._costmap_cli.wait_for_service(timeout_sec=5.0):
             raise RuntimeError(f"Costmap node {costmap_node_name} is not found.")
 
         self._adjust_cli = self.create_client(AdjustWaypoints, adjust_service)
-        if not self._adjust_cli.wait_for_service(timeout_sec=1.0):
+        if not self._adjust_cli.wait_for_service(timeout_sec=5.0):
             raise RuntimeError(f"Adjust service {adjust_service} is not found.")
 
         self._need_adjust_cli = self.create_client(NeedAdjust, need_adjust_service)
-        if not self._need_adjust_cli.wait_for_service(timeout_sec=1.0):
+        if not self._need_adjust_cli.wait_for_service(timeout_sec=5.0):
             raise RuntimeError(
                 f"Need adjust service {need_adjust_service} is not found."
             )

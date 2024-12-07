@@ -73,47 +73,52 @@ controller_server:
       xy_goal_tolerance: 0.8
       stateful: True
       #yaw_goal_tolerance: 0.174 # 10 degrees
-      yaw_goal_tolerance: 1.57 # 10 degrees
+      yaw_goal_tolerance: 3.14 # 10 degrees
     FollowPath:
-#      plugin: "dwb_core::DWBLocalPlanner"
-#      debug_trajectory_details: True
-#      min_vel_x: 0.0
-#      min_vel_y: 0.0
+      plugin: "dwb_core::DWBLocalPlanner"
+      debug_trajectory_details: True
+      min_vel_x: 0.0
+      min_vel_y: 0.0
 #      max_vel_x: 0.26
-#      max_vel_y: 0.0
+      max_vel_x: 1.0
+      max_vel_y: 0.0
 #      max_vel_theta: 1.0
-#      min_speed_xy: 0.0
-#      max_speed_xy: 0.26
-#      min_speed_theta: 0.0
+      max_vel_theta: 1.57
+      min_speed_xy: 0.0
+      max_speed_xy: 0.7
+      min_speed_theta: 0.0
 #      acc_lim_x: 2.5
-#      acc_lim_y: 0.0
+      acc_lim_x: 1.0
+      acc_lim_y: 0.0
+      acc_lim_theta: 1.0
 #      acc_lim_theta: 3.2
-#      decel_lim_x: -2.5
-#      decel_lim_y: 0.0
-#      decel_lim_theta: -3.2
-#      vx_samples: 20
-#      vy_samples: 5
-#      vtheta_samples: 20
-#      sim_time: 1.7
-#      linear_granularity: 0.05
-#      angular_granularity: 0.025
-#      transform_tolerance: 0.2
-#      xy_goal_tolerance: 0.25
-#      trans_stopped_velocity: 0.25
-#      short_circuit_trajectory_evaluation: True
-#      limit_vel_cmd_in_traj: False
-#      stateful: True
-#      critics: ["RotateToGoal", "Oscillation", "BaseObstacle", "GoalAlign", "PathAlign", "PathDist", "GoalDist"]
-#      BaseObstacle.scale: 0.02
-#      PathAlign.scale: 32.0
-#      GoalAlign.scale: 24.0
-#      PathAlign.forward_point_distance: 0.1
-#      GoalAlign.forward_point_distance: 0.1
-#      PathDist.scale: 32.0
-#      GoalDist.scale: 24.0
-#      RotateToGoal.scale: 32.0
-#      RotateToGoal.slowing_factor: 5.0
-#      RotateToGoal.lookahead_time: -1.0
+      decel_lim_x: -2.5
+      decel_lim_y: 0.0
+      decel_lim_theta: -3.2
+      vx_samples: 20
+      vy_samples: 5
+      vtheta_samples: 20
+      sim_time: 1.7
+      linear_granularity: 0.05
+      angular_granularity: 0.025
+      transform_tolerance: 0.2
+      xy_goal_tolerance: 0.8
+      trans_stopped_velocity: 0.8
+      short_circuit_trajectory_evaluation: True
+      limit_vel_cmd_in_traj: False
+      stateful: True
+      critics: ["RotateToGoal", "Oscillation", "BaseObstacle", "GoalAlign", "PathAlign", "PathDist", "GoalDist"]
+      BaseObstacle.scale: 0.02
+      PathAlign.scale: 32.0
+      #PathAlign.scale: 10.0
+      GoalAlign.scale: 24.0
+      PathAlign.forward_point_distance: 0.1
+      GoalAlign.forward_point_distance: 0.1
+      PathDist.scale: 32.0
+      GoalDist.scale: 24.0
+      RotateToGoal.scale: 32.0
+      RotateToGoal.slowing_factor: 5.0
+      RotateToGoal.lookahead_time: -1.0
 
 
 #    # MPPI Controller
@@ -220,52 +225,53 @@ controller_server:
 #      #   twirling_cost_weight: 10.0
 
 
-    # RegulatedPurePursuitController
-      plugin: "nav2_regulated_pure_pursuit_controller::RegulatedPurePursuitController"
-      # --- speed ------------------------------------------------------
-      desired_linear_vel: 0.4
-      desired_linear_vel: 0.7
-      #desired_linear_vel: 0.45
-      min_approach_linear_velocity: 0.35
-      #min_approach_linear_velocity: 0.45
-      approach_velocity_scaling_dist: 1.0
-      #approach_velocity_scaling_dist: 0.01
-      # --- speed scaling in curvature ------------------------------------------------------
-      use_regulated_linear_velocity_scaling: true
-      use_cost_regulated_linear_velocity_scaling: true
-      regulated_linear_scaling_min_radius: 0.5
-      regulated_linear_scaling_min_speed: 0.1
-      # --- rotation ------------------------------------------------------
-      use_rotate_to_heading: true
-      #use_rotate_to_heading: true
-      rotate_to_heading_min_angle: 0.5
-     #rotate_to_heading_min_angle: 0.349 # 20 degrees
-      rotate_to_heading_angular_vel: 0.8
-      #rotate_to_heading_angular_vel: 0.5
-      #max_angular_accel: 0.5
-      max_angular_accel: 1.0
-      # --- lookahead point ------------------------------------------------------
-      use_velocity_scaled_lookahead_dist: true
-      #   --- use_velocity_scaled_lookahead_dist == false
-      lookahead_dist: 1.2
-      #   --- use_velocity_scaled_lookahead_dist == true
-      min_lookahead_dist: 0.8
-      max_lookahead_dist: 2.5
-      lookahead_time: 1.0
-      #   --- velocity scaling in curvature
-      use_fixed_curvature_lookahead: true
-      curvature_lookahead_dist: 0.1
-      # --- reversing ------------------------------------------------------
-      allow_reversing: false
-      # --- positioning ------------------------------------------------------
-      #transform_tolerance: 0.2
-      transform_tolerance: 1.57
-      # --- collision detection ------------------------------------------------------
-      use_collision_detection: true
-      max_allowed_time_to_collision: 1.0
-      # --- others ------------------------------------------------------
-      max_robot_pose_search_dist: 8.0
-      use_interpolation: false
+#    # RegulatedPurePursuitController
+#      plugin: "nav2_regulated_pure_pursuit_controller::RegulatedPurePursuitController"
+#      # --- speed ------------------------------------------------------
+#      #desired_linear_vel: 0.4
+#      desired_linear_vel: 0.7
+#      #desired_linear_vel: 0.45
+#      min_approach_linear_velocity: 0.35
+#      #min_approach_linear_velocity: 0.45
+#      approach_velocity_scaling_dist: 1.0
+#      #approach_velocity_scaling_dist: 0.01
+#      # --- speed scaling in curvature ------------------------------------------------------
+#      use_regulated_linear_velocity_scaling: true
+#      use_cost_regulated_linear_velocity_scaling: true
+#      regulated_linear_scaling_min_radius: 0.5
+#      regulated_linear_scaling_min_speed: 0.1
+#      # --- rotation ------------------------------------------------------
+#      use_rotate_to_heading: true
+#      #use_rotate_to_heading: true
+#      rotate_to_heading_min_angle: 0.5
+#     #rotate_to_heading_min_angle: 0.349 # 20 degrees
+#      rotate_to_heading_angular_vel: 0.8
+#      #rotate_to_heading_angular_vel: 0.5
+#      #max_angular_accel: 0.5
+#      max_angular_accel: 1.0
+#      # --- lookahead point ------------------------------------------------------
+#      use_velocity_scaled_lookahead_dist: true
+#      #   --- use_velocity_scaled_lookahead_dist == false
+#      lookahead_dist: 1.2
+#      #   --- use_velocity_scaled_lookahead_dist == true
+#      min_lookahead_dist: 0.8
+#      max_lookahead_dist: 2.5
+#      lookahead_time: 1.0
+#      #   --- velocity scaling in curvature
+#      use_fixed_curvature_lookahead: true
+#      curvature_lookahead_dist: 0.1
+#      # --- reversing ------------------------------------------------------
+#      allow_reversing: false
+#      # --- positioning ------------------------------------------------------
+#      #transform_tolerance: 0.2
+#      transform_tolerance: 1.57
+#      # --- collision detection ------------------------------------------------------
+#      use_collision_detection: false
+#      max_allowed_time_to_collision: 1.0
+#      # --- others ------------------------------------------------------
+#      #max_robot_pose_search_dist: 8.0
+#      max_robot_pose_search_dist: 800000.0
+#      use_interpolation: false
 
 controller_server_rclcpp_node:
   ros__parameters:
@@ -497,7 +503,8 @@ collision_monitor:
     PolygonStop:
       type: "polygon"
       #points: [0.5, 0.4, 0.5, -0.4, -0.4, -0.4, -0.4, 0.4]
-      points: [0.25, 0.25, 0.25, -0.25, -0.25, -0.25, -0.25, 0.25]
+      #points: [0.65, 0.43, 0.65, -0.43, -0.43, -0.43, -0.43, 0.43]
+      points: [0.65, 0.5, 0.65, -0.5, -0.43, -0.43, -0.43, 0.43]
       action_type: "stop"
       max_points: 3
       visualize: True
@@ -505,10 +512,10 @@ collision_monitor:
       enabled: True
     PolygonSlow:
       type: "polygon"
-      points: [0.7, 0.7, 0.7, -0.7, -0.7, -0.7, -0.7, 0.7]
+      points: [1.5, 1.0, 1.5, -1.0, -1.5, -1.0, -1.5, 1.0]
       action_type: "slowdown"
       max_points: 3
-      slowdown_ratio: 0.8
+      slowdown_ratio: 0.5
       visualize: True
       polygon_pub_topic: "polygon_slowdown"
       enabled: True
